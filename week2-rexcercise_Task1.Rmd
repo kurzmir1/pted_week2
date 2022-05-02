@@ -38,7 +38,7 @@ wildschwein_BE <- read_delim("wildschwein_BE_2056.csv",",") # adjust path
 
 wildschwein_BE <- st_as_sf(wildschwein_BE, coords = c("E", "N"), crs = 2056, remove = FALSE)
 
-#####Task 1: Overview
+#####Task 2: Overview
 
 ### Calculate time difference
 
@@ -65,6 +65,7 @@ ggplot(data=wildschwein_BE, mapping=aes(DatetimeUTC, timelag,colour=TierID))+
 #Solution:They were tracked concurrently.
 
 ####For how long were the individuals tracked? Are there gaps?
+
 wildschwein_BE %>%
   group_by(TierID)%>%
   summarise(
@@ -74,6 +75,7 @@ wildschwein_BE %>%
 
 
 ####What is the temporal sampling interval between the locations?
+
 wildschwein_BE%>%
   group_by(TierID)%>%
   summarise(median(timelag,na.rm=TRUE))
@@ -87,12 +89,21 @@ ggplot(data=wildschwein_BE,mapping=aes(x=timelag))+
 #Solution: On average every individual was sampled every 900 seconds. There are some gaps where it wasn't sampled for more than 10'000 seconds.
   
 
+#####Task 3: Movement parameters - Speed 
   
+####Calculate steplength
+
+wildschwein_BE <- wildschwein_BE %>%
+  group_by(TierID) %>%
+  mutate(steplength = sqrt((E- lead(E,1))^2 + (N -lead(N,1))^2))
   
+####Calculate speed
+wildschwein_BE <- wildschwein_BE %>%
+  mutate(speed=steplength/timelag)
   
-  
-  
-  
+#Solution: I get speed unit m/s
+
+
   
   
   
