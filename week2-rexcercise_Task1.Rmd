@@ -1,0 +1,107 @@
+---
+title: "week2-rexcercise"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+library(readr)        # to import tabular data (e.g. csv)
+library(dplyr)        # to manipulate (tabular) data
+library(ggplot2)      # to visualize data
+library(sf)           # to handle spatial vector data
+library(terra)        # To handle raster data
+library(lubridate)    # To handle dates and times
+
+wildschwein_BE <- read_delim("wildschwein_BE_2056.csv",",") # adjust path
+
+wildschwein_BE <- st_as_sf(wildschwein_BE, coords = c("E", "N"), crs = 2056, remove = FALSE)
+
+#####Task 1: Overview
+
+### Calculate time difference
+
+wildschwein_BE<-wildschwein_BE %>%
+  group_by(TierID) %>%
+  mutate(timelag=as.integer(difftime(lead(DatetimeUTC), DatetimeUTC,units="secs")))
+
+### How many individuals were tracked? 
+
+ggplot(data=wildschwein_BE, mapping=aes(DatetimeUTC, TierID))+
+  geom_line()
+  x= "TierID"
+  y= "DatetimeUTC"
+  )
+#Solution: Three individuals were tracked.
+
+####Were they tracked conurrently or sequentially?
+ggplot(data=wildschwein_BE, mapping=aes(DatetimeUTC, timelag,colour=TierID))+
+  geom_line()
+  x= "timelag"
+  y= "DatetimeUTC"
+  )
+
+#Solution:They were tracked concurrently.
+
+####For how long were the individuals tracked? Are there gaps?
+wildschwein_BE %>%
+  group_by(TierID)%>%
+  summarise(
+  difftime(max(DatetimeUTC), min(DatetimeUTC), units = "days"))
+  
+#Solution: Individual 002A was tracked for 338 days, 016A for 234 days and 018 for 261 days.
+
+
+####What is the temporal sampling interval between the locations?
+wildschwein_BE%>%
+  group_by(TierID)%>%
+  summarise(median(timelag,na.rm=TRUE))
+
+ggplot(data=wildschwein_BE,mapping=aes(x=timelag))+
+  geom_histogram(binwidth =10)+
+  scale_y_log10()+
+  xlim(0,15000)+
+  theme_classic()
+  
+#Solution: On average every individual was sampled every 900 seconds. There are some gaps where it wasn't sampled for more than 10'000 seconds.
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
