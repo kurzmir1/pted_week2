@@ -27,24 +27,26 @@ wildschwein_BE<-wildschwein_BE %>%
 ```
 ### How many individuals were tracked? 
 ```{r}
-ggplot(data=wildschwein_BE, mapping=aes(DatetimeUTC, TierID)+
-  geom_line()
-  x= "TierID"
-  y= "DatetimeUTC"
-  )
+ggplot(wildschwein_BE, mapping=aes(DatetimeUTC, TierID))+
+  geom_line()+
+  labs(
+    x="TierID",
+    y="DatetimeUTC"
+    )
 ````
-#Solution: Three individuals were tracked.
+Solution: Three individuals were tracked.
 
 ####Were they tracked conurrently or sequentially?
 ```{r}
 ggplot(data=wildschwein_BE, mapping=aes(DatetimeUTC, timelag,colour=TierID))+
-  geom_line()
-  x= "timelag"
-  y= "DatetimeUTC"
+  geom_line()+
+  labs(
+    x="timelag",
+    y="DatetimeUTC"
   )
 ````
 
-#Solution:They were tracked concurrently.
+Solution:They were tracked concurrently.
 
 ####For how long were the individuals tracked? Are there gaps?
 ```{r}
